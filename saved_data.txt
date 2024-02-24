@@ -1,0 +1,45 @@
+326944300170608642
+Balance: 121.5
+Total Cases Opened: 24.0
+Total Winnings: 21.500000000000014
+Blue: 19.0
+Purple: 3.0
+Pink: 2.0
+Red: 0.0
+Yellow: 0.0
+317801961137242114
+Balance: 1163.5
+Total Cases Opened: 18.0
+Total Winnings: 1006.0000000000001
+Blue: 12.0
+Purple: 4.0
+Pink: 0.0
+Red: 0.0
+Yellow: 2.0
+156945150881300481
+Balance: 184.3
+Total Cases Opened: 7.0
+Total Winnings: 1.9
+Blue: 6.0
+Purple: 1.0
+Pink: 0.0
+Red: 0.0
+Yellow: 0.0
+420358528226820118
+Balance: 161.8
+Total Cases Opened: 33.0
+Total Winnings: 41.80000000000002
+Blue: 23.0
+Purple: 6.0
+Pink: 4.0
+Red: 0.0
+Yellow: 0.0
+959170647504863333
+Balance: 188.0
+Total Cases Opened: 5.0
+Total Winnings: 0.5
+Blue: 5.0
+Purple: 0.0
+Pink: 0.0
+Red: 0.0
+Yellow: 0.0
