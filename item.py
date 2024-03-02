@@ -15,19 +15,19 @@ def floatName(float):
 
 class Item:
     
-    def __init__(self, name, price, rarity, st, float, pattern, time_unboxed):
+    def __init__(self, name, price, rarity, st, float, pattern):
         self.name = name
         self.price = price
         self.rarity = rarity
         self.st = st
         self.float = float
         self.pattern = pattern
-        self.time_unboxed = time_unboxed
 
     def __str__(self):
         global item_dict
         stattrak_str = "StatTrak™" if self.st else ""
-        all_str = stattrak_str + " " + floatName(self.float)+ " " + self.name + ": " + item_dict[self.rarity] +  ", Float: " + self.float + " , Pattern: " + self.pattern + ", is currently worth: " + self.price + ". Unboxed at: " + self.time_unboxed
+        float_str = floatName(self.float) if not self.float == None else ""
+        all_str = stattrak_str + " " + floatName(self.float) + " " + self.name + ": " + item_dict[self.rarity] + " , Pattern: " + self.pattern + ", is currently worth: " + self.price
         return all_str
     
     

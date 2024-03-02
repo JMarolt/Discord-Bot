@@ -29,6 +29,9 @@ async def on_ready():
     if chan:
         await fillLvs(chan.guild)
 
+    #IN HERE, WE HAVE TO CREATE THE ITEMHOLDERS
+    init_cases()
+
     # crate_channel_id = '1198534706245947392'
     # channel = bot.get_channel(int(crate_channel_id))
     # if channel:
@@ -539,6 +542,7 @@ async def commands(ctx):
     **(1)** !balance - States your balance
     **(1)** !loan {n} - Take out a loan of n dollars
     **(1)** !sell {n} - Sells the nth item in your inventory **NO REFUNDS**
+    **(1)** !sell_all - Sells your entire inventory **NO REFUNDS**
     **(1)** !stats - Shows case opening statistics
     **(1)** !leaderboards - Shows most valuable inventorys
     **(1)** !join - Joins current voice channel
@@ -573,4 +577,5 @@ async def commands(ctx):
 
     await ctx.send(to_send)
 
-bot.run('NjQ2NTk0NDE1NDA5NzU4MjA5.Gv_jIX.5Od_GtcPFndP28k-k0I5QGC5E0DJXoID81VpIQ')
+#BOT CODE HIDDEN
+bot.run('')

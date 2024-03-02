@@ -1,5 +1,7 @@
 import random
 from player import *
+from itemHolder import *
+from item import *
 
 import requests
 from bs4 import BeautifulSoup
@@ -37,6 +39,11 @@ def scrapeAllItemInformation():
         test = soup.find('div', class_='kxmatkcipwonxvwweiqqdoumxg')
         print(test)
 
+def init_cases():
+    file_name = "discord_bot\cases.txt"
+    with open(file_name, 'r') as file:
+        pass
+
 class Case:
 
     #names include actual case name and shortened names that make it easier to open cases
@@ -45,14 +52,32 @@ class Case:
         self.type = type
         self.img_url = img_url
         self.item_url = item_url
-        self.createItemHolders(item_url)
+        self.itemHolders = self.createItemHolders(item_url)
 
     def createItemHolders(self, file_name):
         with open(file_name, 'r') as file:
             pass
 
     def createItem(self, rarity):
-        pass
+        items = []
+        for item in self.itemHolders:
+            if(item.getRarity() == rarity):
+                items.append(item)
+        index = random.randint(0, len(items) - 1)
+        specific_item = items[index]
+        if not specific_item.getItemType == "Sticker":
+            float = random.uniform(specific_item.getFloatMin(), specific_item.getFloatMax())
+        else:
+            float = None
+        if specific_item.getST == True:
+            if random.randint(1, 10) == 1:
+                st = True
+        else:
+            st = False
+        price = specific_item.getPrice(float, st)
+        new_item = Item(specific_item.getName(), price, rarity, st, float, random.randint(0, 1000))
+        return new_item
+        
     
 
 # url = 'https://wiki.cs.money/cases'
