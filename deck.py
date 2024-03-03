@@ -24,11 +24,11 @@ class Deck():
         c = self.cards
         new_list = []
         for i in range(5):
+            new_list = []
             for k in range(52):
                 index = random.randint(0, len(c) - 1)
                 new_list.append(c.pop(index))
             c = new_list
-            new_list = []
         self.cards = new_list
 
     def deal(self):
