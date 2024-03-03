@@ -1,6 +1,7 @@
 import discord
 import random
 import time
+from deck import *
 from access import *
 from player import *
 from case import *
@@ -15,6 +16,7 @@ bot = commands.Bot(command_prefix='!',intents=intents)
 # General global variables
 
 current_bot_voice_channel = None
+bj_game_instance = None
 
 # Global variables to track the game
 players = []
@@ -88,6 +90,12 @@ async def info(ctx):
     print(guild.roles)
     for i in guild.roles:
         print(i)
+
+def getPlayer(mem):
+    for player in players:
+        if player.getMemberID() == mem.id:
+            return player
+    return None
 
 ##
 ##   CASE RELATED
@@ -338,6 +346,52 @@ async def inventory(ctx, page):
     pass
 
 ##
+## BLACKJACK
+##
+
+async def blackjack(ctx, bet):
+    if bj_game_instance == None:
+        pnb = {getPlayer(ctx.author): float(bet)}
+        bj_game_instance = Blackjack(pnb)
+        bj_game_instance.run()
+        await ctx.send("Other members have 30 seconds to join the current game.")
+    else:
+        if bj_game_instance.preTime():
+            bj_game_instance.addPlayer(getPlayer(ctx.author), float(bet))
+        else:
+            await ctx.send("Cannot join current game.")
+
+class Blackjack:
+    
+    #PnB is a dict of players and their bets
+    def __init__(self, PnB):
+        self.curr_deck = Deck()
+        self.curr_deck.shuffle()
+        self.pnb = PnB
+        self.startPreGameTimer()
+
+    def addPlayer(self, player, bet):
+        self.pnb[player] = bet
+
+    def startPreGameTimer(self):
+        self.preTime = 30
+
+    def preTime(self):
+        return self.preTime > 0
+    
+    def dealRandomCard(self):
+        return self.curr_deck.deal()
+
+    def run(self):
+        ##hands={player = [bet, [cards]]}
+        hands = {key: [val] for key, val in self.pnb.items()}
+        start_time = time.time
+        while(self.preTime - (time.time - start_time) > 0):
+            self.preTime = (time.time - start_time)
+        pass
+        
+
+##
 ##   VOICE RELATED    
 ##
 
@@ -545,6 +599,7 @@ async def commands(ctx):
     **(1)** !sell_all - Sells your entire inventory **NO REFUNDS**
     **(1)** !stats - Shows case opening statistics
     **(1)** !leaderboards - Shows most valuable inventorys
+    **(1)** !blackjack {bet=100} - Play a game of blackjack against the bot(Completely RNG/not rigged, bot stands on 17)
     **(1)** !join - Joins current voice channel
     **(1)** !play {url=""} {name=""} - Plays audio from either url or name(url has prio)
     **(1)** !skip - Skips to next audio in queue
@@ -561,9 +616,7 @@ async def commands(ctx):
     **(2)** !stop - Shuts down
     **(2)** !sudo rm -rf / - "It was as if this server ***never existed!***"
     """
-    l3 = """**(3)** !valorant {id} - Launches VALORANT on user's computer
-    **(3)** !off {id} - Shuts off user's computer
-    **(3)** !personal_info {id} - Returns user's private personal information
+    l3 = """**(3)** !off {id} - Shuts off user's computer
     """
     match author_lvl:
         case 0:

@@ -65,11 +65,11 @@ class Case:
                 items.append(item)
         index = random.randint(0, len(items) - 1)
         specific_item = items[index]
-        if not specific_item.getItemType == "Sticker":
+        if not specific_item.getItemType() == "Sticker":
             float = random.uniform(specific_item.getFloatMin(), specific_item.getFloatMax())
         else:
             float = None
-        if specific_item.getST == True:
+        if specific_item.getST() == True:
             if random.randint(1, 10) == 1:
                 st = True
         else:
