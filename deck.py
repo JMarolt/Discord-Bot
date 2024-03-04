@@ -23,7 +23,7 @@ class Deck():
     def shuffle(self):
         c = self.cards
         new_list = []
-        for i in range(5):
+        for i in range(3):
             new_list = []
             for k in range(52):
                 index = random.randint(0, len(c) - 1)
@@ -33,3 +33,6 @@ class Deck():
 
     def deal(self):
         return self.cards.pop(0)
+    
+    def getDeck(self):
+        return self.cards

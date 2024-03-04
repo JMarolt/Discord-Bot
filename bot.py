@@ -1,11 +1,14 @@
 import discord
 import random
 import time
+from timer import *
 from deck import *
 from access import *
 from player import *
 from case import *
 from discord.ext import commands
+from discord.ui import Button
+import discord.enums
 
 intents = discord.Intents.default()
 intents.members = True
@@ -349,12 +352,15 @@ async def inventory(ctx, page):
 ## BLACKJACK
 ##
 
+@bot.command()
+@commands.check(lambda ctx: has_required_access(ctx, level=1))
 async def blackjack(ctx, bet):
+    global bj_game_instance
     if bj_game_instance == None:
         pnb = {getPlayer(ctx.author): float(bet)}
         bj_game_instance = Blackjack(pnb)
-        bj_game_instance.run()
-        await ctx.send("Other members have 30 seconds to join the current game.")
+        await bj_game_instance.run(ctx)
+        #await ctx.send("Other members have 30 seconds to join the current game.")
     else:
         if bj_game_instance.preTime():
             bj_game_instance.addPlayer(getPlayer(ctx.author), float(bet))
@@ -368,13 +374,14 @@ class Blackjack:
         self.curr_deck = Deck()
         self.curr_deck.shuffle()
         self.pnb = PnB
-        self.startPreGameTimer()
 
     def addPlayer(self, player, bet):
         self.pnb[player] = bet
 
     def startPreGameTimer(self):
-        self.preTime = 30
+        self.preTime = 1
+        pre_timer = Timer()
+        pre_timer.wait(self.preTime)
 
     def preTime(self):
         return self.preTime > 0
@@ -382,13 +389,34 @@ class Blackjack:
     def dealRandomCard(self):
         return self.curr_deck.deal()
 
-    def run(self):
+    async def run(self, ctx):
         ##hands={player = [bet, [cards]]}
-        hands = {key: [val] for key, val in self.pnb.items()}
-        start_time = time.time
-        while(self.preTime - (time.time - start_time) > 0):
-            self.preTime = (time.time - start_time)
-        pass
+        dealer_hand = []
+        hands = {key: [val, []] for key, val in self.pnb.items()}
+        self.startPreGameTimer()
+        #in_game_timer = Timer()
+        #Start game, wait 2 seconds before dealing card, 1 second in between each player
+        #call wait
+        for i in range(2):
+            for hand in hands.keys():
+                card = self.curr_deck.deal()
+                hands[hand][1].append(card)
+            dealer_hand.append(self.curr_deck.deal())
+        await ctx.send("Dealer hand: " + str(dealer_hand) + "\n" + "Current hands: " + str(hands))
+        embed = discord.Embed(title="Blackjack")
+        embed.add_field(name="Dealer's hand", value=str(dealer_hand))
+        embed.add_field(name="Player's hand", value=str(str(hands)))
+        action_row = [
+            # Button(style=ButtonStyle.green, label="Hit", custom_id="hit"),
+            # Button(style=ButtonStyle.red, label="Stand", custom_id="stand"),
+            # Button(style=ButtonStyle.blue, label="Double Down", custom_id="double"),
+            # Button(style=ButtonStyle.grey, label="Split", custom_id="split")
+            Button(label="Hit", custom_id="hit"),
+            Button(label="Stand", custom_id="stand"),
+            Button(label="Double Down", custom_id="double"),
+            Button(label="Split", custom_id="split")
+        ]
+        await ctx.send(embed=embed, components=[action_row])
         
 
 ##
@@ -599,12 +627,14 @@ async def commands(ctx):
     **(1)** !sell_all - Sells your entire inventory **NO REFUNDS**
     **(1)** !stats - Shows case opening statistics
     **(1)** !leaderboards - Shows most valuable inventorys
-    **(1)** !blackjack {bet=100} - Play a game of blackjack against the bot(Completely RNG/not rigged, bot stands on 17)
+    **(1)** !blackjack {bet=100} - Play a game of blackjack against the bot(Bot stands on 17)
+    **(1)** !fs - Forces the start of a blackjack game(must be in it)
+    **(1)** !poker - plays five card poker(3 players minimum)
     **(1)** !join - Joins current voice channel
     **(1)** !play {url=""} {name=""} - Plays audio from either url or name(url has prio)
     **(1)** !skip - Skips to next audio in queue
     **(1)** !queue - Shows the commands queue
-    **(1)** !dc - Disconnect from voice channel
+    **(1)** !dc - Disconnect bot from voice channel
     """
     l2 = """**(2)** !command_praise - Forces users below you to praise you before they can use the bot
     **(2)** !grant_permission {id} {n} - Changes level access to n for user with id
@@ -631,4 +661,4 @@ async def commands(ctx):
     await ctx.send(to_send)
 
 #BOT CODE HIDDEN
-bot.run('')
+bot.run('NjQ2NTk0NDE1NDA5NzU4MjA5.Ghv-37.ZAUnjKFjU460Lvss4Oq-aFDh5AL9TDvx5Ibjbs')
