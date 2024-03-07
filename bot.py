@@ -8,7 +8,7 @@ from player import *
 from case import *
 from discord.ext import commands
 from discord.ui import Button
-import discord.enums
+import discord.ui.view
 
 intents = discord.Intents.default()
 intents.members = True
@@ -388,9 +388,29 @@ class Blackjack:
     
     def dealRandomCard(self):
         return self.curr_deck.deal()
+    
+    def viewObj(self):
+        v = discord.ui.View()
+        b1 = discord.ui.Button(style=discord.ButtonStyle.blurple, label="Hit", custom_id="hit")
+        b2 = discord.ui.Button(style=discord.ButtonStyle.blurple, label="Stand", custom_id="stand")
+        b3 = discord.ui.Button(style=discord.ButtonStyle.blurple, label="Double Down", custom_id="dd")
+        b4 = discord.ui.Button(style=discord.ButtonStyle.blurple, label="Split", custom_id="split")
+        v.add_item(b1)
+        v.add_item(b2)
+        v.add_item(b3)
+        v.add_item(b4)
+        return v
+    
+    def handStr(self, hand):
+        cards = [list(dic.keys())[0] for dic in hand]
+        return ', '.join(cards)
+
+    def handValue(self, hand):
+        val = [list(dic.values())[0] for dic in hand]
+        return sum(val)
 
     async def run(self, ctx):
-        ##hands={player = [bet, [cards]]}
+        #this is hands -> hands={player = [bet, [cards]]}
         dealer_hand = []
         hands = {key: [val, []] for key, val in self.pnb.items()}
         self.startPreGameTimer()
@@ -402,21 +422,16 @@ class Blackjack:
                 card = self.curr_deck.deal()
                 hands[hand][1].append(card)
             dealer_hand.append(self.curr_deck.deal())
-        await ctx.send("Dealer hand: " + str(dealer_hand) + "\n" + "Current hands: " + str(hands))
         embed = discord.Embed(title="Blackjack")
-        embed.add_field(name="Dealer's hand", value=str(dealer_hand))
-        embed.add_field(name="Player's hand", value=str(str(hands)))
-        action_row = [
-            # Button(style=ButtonStyle.green, label="Hit", custom_id="hit"),
-            # Button(style=ButtonStyle.red, label="Stand", custom_id="stand"),
-            # Button(style=ButtonStyle.blue, label="Double Down", custom_id="double"),
-            # Button(style=ButtonStyle.grey, label="Split", custom_id="split")
-            Button(label="Hit", custom_id="hit"),
-            Button(label="Stand", custom_id="stand"),
-            Button(label="Double Down", custom_id="double"),
-            Button(label="Split", custom_id="split")
-        ]
-        await ctx.send(embed=embed, components=[action_row])
+        dealer_hand_val = str(self.handValue(dealer_hand))
+        embed.add_field(name=str("Dealer's hand (Value = " + dealer_hand_val + ")"), value=self.handStr(dealer_hand), inline=False)
+        for hand in hands.keys():
+            val = str(self.handValue(hands[hand][1]))
+            embed.add_field(name=str("Player's hand (Value = " + val + ")"), value=self.handStr(hands[hand][1]), inline=False)
+        v = self.viewObj()
+        await ctx.send(embed=embed, view=v)
+
+
         
 
 ##
@@ -661,4 +676,4 @@ async def commands(ctx):
     await ctx.send(to_send)
 
 #BOT CODE HIDDEN
-bot.run('NjQ2NTk0NDE1NDA5NzU4MjA5.Ghv-37.ZAUnjKFjU460Lvss4Oq-aFDh5AL9TDvx5Ibjbs')
+bot.run('')
