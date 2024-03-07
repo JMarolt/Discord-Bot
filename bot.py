@@ -12,6 +12,7 @@ import discord.ui.view
 
 intents = discord.Intents.default()
 intents.members = True
+intents.messages = True
 intents.message_content = True
 
 bot = commands.Bot(command_prefix='!',intents=intents)
@@ -368,8 +369,7 @@ async def blackjack(ctx, bet):
             await ctx.send("Cannot join current game.")
 
 class Blackjack:
-    
-    #PnB is a dict of players and their bets
+
     def __init__(self, PnB):
         self.curr_deck = Deck()
         self.curr_deck.shuffle()
@@ -388,18 +388,32 @@ class Blackjack:
     
     def dealRandomCard(self):
         return self.curr_deck.deal()
-    
-    def viewObj(self):
-        v = discord.ui.View()
-        b1 = discord.ui.Button(style=discord.ButtonStyle.blurple, label="Hit", custom_id="hit")
-        b2 = discord.ui.Button(style=discord.ButtonStyle.blurple, label="Stand", custom_id="stand")
-        b3 = discord.ui.Button(style=discord.ButtonStyle.blurple, label="Double Down", custom_id="dd")
-        b4 = discord.ui.Button(style=discord.ButtonStyle.blurple, label="Split", custom_id="split")
-        v.add_item(b1)
-        v.add_item(b2)
-        v.add_item(b3)
-        v.add_item(b4)
-        return v
+
+    class optionButtons(discord.ui.View):
+        @discord.ui.button(label="Hit", row=0, custom_id="hit", style=discord.ButtonStyle.blurple)
+        async def hit_button(self, interaction:discord.Interaction, button:discord.ui.Button):
+            self.disableButtons(view=self, cust_id="hit")
+            await interaction.response.edit_message(view=self)
+        @discord.ui.button(label="Stand", row=0, custom_id="stand", style=discord.ButtonStyle.blurple)
+        async def stand_button(self, interaction:discord.Interaction, button:discord.ui.Button):
+            self.disableButtons(view=self, cust_id="stand")
+            await interaction.response.edit_message(view=self)
+        @discord.ui.button(label="Double Down", row=0, custom_id="dd", style=discord.ButtonStyle.blurple)
+        async def dd_button(self, interaction:discord.Interaction, button:discord.ui.Button):
+            self.disableButtons(view=self, cust_id="dd")
+            await interaction.response.edit_message(view=self)
+        @discord.ui.button(label="Split", row=0, custom_id="split", style=discord.ButtonStyle.blurple)
+        async def split_button(self, interaction:discord.Interaction, button:discord.ui.Button):
+            self.disableButtons(view=self, cust_id="split")
+            await interaction.response.edit_message(view=self)
+
+        def disableButtons(self, view, cust_id):
+            for child in view.children:
+                child.disabled=True
+                if not child.custom_id == cust_id:
+                    child.style=discord.ButtonStyle.red
+                else:
+                    child.style=discord.ButtonStyle.green
     
     def handStr(self, hand):
         cards = [list(dic.keys())[0] for dic in hand]
@@ -428,11 +442,13 @@ class Blackjack:
         for hand in hands.keys():
             val = str(self.handValue(hands[hand][1]))
             embed.add_field(name=str("Player's hand (Value = " + val + ")"), value=self.handStr(hands[hand][1]), inline=False)
-        v = self.viewObj()
-        await ctx.send(embed=embed, view=v)
+        v = self.optionButtons()
+        message = await ctx.send(embed=embed, view=v)
+        # while(True):
+        #     if self.optionButtons.buttonWasPressed:
+        #         await message.edit(embed=embed, view=v)
+        #         self.optionButtons.buttonWasPressed=False
 
-
-        
 
 ##
 ##   VOICE RELATED    
@@ -676,4 +692,4 @@ async def commands(ctx):
     await ctx.send(to_send)
 
 #BOT CODE HIDDEN
-bot.run('')
+bot.run('NjQ2NTk0NDE1NDA5NzU4MjA5.G22JP8.ixkwVm9DQHeIahS20d-DuZRDAXnKotsIRSPsa4')
